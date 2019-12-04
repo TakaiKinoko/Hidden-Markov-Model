@@ -70,6 +70,10 @@
 ### implement viterbi algorithm 
 
 * implemented in __src/viterbi.py__
+* run: 
+    ```
+    $ python viterbi.py
+    ```
 * output path: __output/sen_tagged.predict__
 
 ### evaluation 

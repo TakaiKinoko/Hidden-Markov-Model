@@ -3,13 +3,13 @@
 __author__="Fang Han Cabrera <fh643@nyu.edu>"
 __date__ ="$Nov 22, 2019"
 
-import count_freqs
-import sys
 from collections import defaultdict
 
 def find_rares (cnts_file):
     '''
-    find all <word, tag> pairs that have a count less than 5 and return them in a list
+    find all words that have a count less than 5 and return them in a list
+    :param cnts_file: file containing frequency data in the form of <frequency> <tag> <NE> <word>
+    :return: a set of words as rare
     '''
     rares = set() # list to store all rare words found in ner.counts
     cnt_dict = defaultdict(int)
@@ -29,7 +29,11 @@ def find_rares (cnts_file):
 
 def retag_with_rare (rares, corpus, outpath):
     '''
-    replace the original tags in the training data with RARE and write to training data file 
+    replace the original tags in the training data with RARE and write to training data file
+
+    :param rares: set of rare words
+    :param corpus: train data
+    :param outpath: file path to write the retagged train data to
     '''
     fout = open(outpath, 'w+')
     corpus_file = open(corpus, "r")
@@ -54,7 +58,6 @@ def retag_with_rare (rares, corpus, outpath):
         else:
             fout.write(l)
         l = corpus_file.readline()
-    return
 
 
 if __name__ == "__main__":

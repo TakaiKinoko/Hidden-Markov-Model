@@ -1,23 +1,19 @@
 #! /usr/bin/python
 
 __author__ = "Fang Han Cabrera <fh643@nyu.edu>"
-__date__ ="$Dec 2, 2019"
+__date__ ="$Nov 22, 2019"
 
 import math
 import sys
 
-new_counts = '../output/ner_with_rare.counts'
-dev_set = '../input/ner_dev.dat'
-prediction_file = '../output/dev_tagged.predict'
-
-def get_counts (cnts_file = new_counts):
-    """
+def get_counts (cnts_file):
+    '''
     computes count(ner) for all ners
     and the collection of <ner, count> pair for each co-occurring word
 
-    @param: path of file containing all ner counts
-    @return: a pair of dicts
-    """
+    :parameter cnts_file: path of file containing all ner counts
+    :return: a pair of dicts
+    '''
     # dict to store <ner, count> pairs, aka count(y)
     ner_count = {}
     # dict to store <word, <ner, count> list>, aka <x, list of count(y, x) for all y>
@@ -44,9 +40,13 @@ def get_counts (cnts_file = new_counts):
     return (ner_count, joint_count)
 
 def compute_emission(word, ner):
-    """
+    '''
     compute e(x|y) as count(y, x) / count(y)
-    """
+
+    :parameter word: word, e.g. 'Nations'
+    :parameter ner: name-entity tag, e.g. 'I-ORG'
+    :return: log probability of the NER tag for the word
+    '''
     cnt_list = joint_count.get(word, joint_count.get("_RARE_"))
     ner_cnt = ner_count.get(ner, 0) # default to 0 if not found
     joint_cnt = cnt_list.get(ner, 0) # default to 0 if not found
@@ -59,9 +59,10 @@ def compute_emission(word, ner):
         sys.exit(1)
 
 def get_max_prob(word):
-    """
-    return predicted NER and it's log probability
-    """
+    '''
+    :parameter word: word to make prediction on
+    :return: predicted NER and it's log probability
+    '''
     cnt_list = joint_count.get(word, joint_count.get("_RARE_"))
 
     em_max = -sys.maxsize
@@ -72,16 +73,17 @@ def get_max_prob(word):
         if emission > em_max:
             em_max = emission
             prediction = ner
-    #TODO log base 2 or e?
-    #return prediction, math.log(em_max, 2)
     return prediction, em_max
 
-def ner_tagger(in_file):
-    """
+def ner_tagger(in_file, prediction_file):
+    '''
     A simple name entity tagger that always produces the tag:
              y* = argmax_y e(x|y)
     for each word x.
-    """
+
+    :paramter in_file: test data to be tagged
+    :prediction_file: file path to write the prediction to
+    '''
     fout = open(prediction_file, 'w+')
     data_file = open(in_file, "r")
     l = data_file.readline()
@@ -93,8 +95,10 @@ def ner_tagger(in_file):
         else:
             fout.write(l)
         l = data_file.readline()
-    return
 
 if __name__ == "__main__":
-    ner_count, joint_count = get_counts()
-    ner_tagger(dev_set)
+    new_counts = '../output/ner_with_rare.counts'
+    dev_set = '../input/ner_dev.dat'
+    prediction_file = '../output/dev_tagged.predict'
+    ner_count, joint_count = get_counts(new_counts)
+    ner_tagger(dev_set, prediction_file)
